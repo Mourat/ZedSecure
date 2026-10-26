@@ -30,12 +30,20 @@ class AppContainer(context: Context) {
     init {
         AppInfo.versionName = BuildConfig.VERSION_NAME
 
-        DeviceIdentity.id = runCatching {
-            android.provider.Settings.Secure.getString(
-                context.contentResolver,
-                android.provider.Settings.Secure.ANDROID_ID,
-            )
-        }.getOrNull().orEmpty()
+        DeviceIdentity.os = "Android"
+        DeviceIdentity.osVersion = android.os.Build.VERSION.RELEASE.orEmpty()
+        DeviceIdentity.model = listOf(android.os.Build.MANUFACTURER, android.os.Build.MODEL)
+            .filter { !it.isNullOrBlank() }
+            .joinToString(" ")
+        DeviceIdentity.ensure(
+            AndroidKeyValueStore(context, "zed_identity"),
+            candidate = runCatching {
+                android.provider.Settings.Secure.getString(
+                    context.contentResolver,
+                    android.provider.Settings.Secure.ANDROID_ID,
+                )
+            }.getOrNull(),
+        )
 
         dev.cluvex.zedsecure.data.net.AndroidMtuProbe.install(context)
 

@@ -82,6 +82,7 @@ import dev.cluvex.zedsecure.desktop.platform.DesktopVpn
 import dev.cluvex.zedsecure.desktop.platform.SingleInstance
 import dev.cluvex.zedsecure.domain.model.ThemeMode
 import dev.cluvex.zedsecure.platform.AppInfo
+import dev.cluvex.zedsecure.platform.DeviceIdentity
 import dev.cluvex.zedsecure.ui.MainScaffold
 import dev.cluvex.zedsecure.ui.platform.LocalPlatform
 import dev.cluvex.zedsecure.ui.theme.LocalMotionBudget
@@ -120,6 +121,15 @@ fun main(args: Array<String>) {
         return
     }
     AppInfo.versionName = BUILD_VERSION
+    val osName = System.getProperty("os.name").orEmpty()
+    DeviceIdentity.os = when {
+        osName.contains("win", ignoreCase = true) -> "Windows"
+        osName.contains("mac", ignoreCase = true) -> "macOS"
+        else -> "Linux"
+    }
+    DeviceIdentity.osVersion = System.getProperty("os.version").orEmpty()
+    DeviceIdentity.model = "Desktop"
+    DeviceIdentity.ensure(DesktopKeyValueStore("identity"))
     Runtime.getRuntime().addShutdownHook(Thread { runCatching { DesktopVpn.shutdown() } })
 
     val rendering = DesktopRendering.apply(

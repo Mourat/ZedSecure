@@ -19,6 +19,7 @@ internal expect fun httpGetResponse(
     socksPort: Int? = null,
     connectTimeoutMs: Int = 15_000,
     readTimeoutMs: Int = 20_000,
+    extraHeaders: Map<String, String> = emptyMap(),
 ): HttpTextResponse
 
 internal expect suspend fun httpJson(

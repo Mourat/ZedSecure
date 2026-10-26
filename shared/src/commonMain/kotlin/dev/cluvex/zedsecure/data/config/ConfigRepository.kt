@@ -1369,10 +1369,13 @@ class ConfigRepository(private val store: KeyValueStore) {
             it > 0 && dev.cluvex.zedsecure.core.VpnManager.status.value.state ==
                 dev.cluvex.zedsecure.domain.model.ConnectionState.Connected
         }
+        val identity = dev.cluvex.zedsecure.platform.DeviceIdentity.subscriptionHeaders()
         if (tunnelPort != null) {
-            runCatching { return httpGetResponse(url, userAgent = ua, socksPort = tunnelPort) }
+            runCatching {
+                return httpGetResponse(url, userAgent = ua, socksPort = tunnelPort, extraHeaders = identity)
+            }
         }
-        return httpGetResponse(url, userAgent = ua)
+        return httpGetResponse(url, userAgent = ua, extraHeaders = identity)
     }
 
     private fun resolveUa(userAgent: String?): String =

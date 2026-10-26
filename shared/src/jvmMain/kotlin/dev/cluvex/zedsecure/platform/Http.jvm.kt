@@ -33,6 +33,7 @@ internal actual fun httpGetResponse(
     socksPort: Int?,
     connectTimeoutMs: Int,
     readTimeoutMs: Int,
+    extraHeaders: Map<String, String>,
 ): HttpTextResponse {
     val target = URL(url)
     val connection = (
@@ -49,6 +50,9 @@ internal actual fun httpGetResponse(
         readTimeout = readTimeoutMs
         instanceFollowRedirects = true
         setRequestProperty("User-Agent", userAgent)
+        extraHeaders.forEach { (name, value) ->
+            if (name.isNotBlank() && value.isNotBlank()) setRequestProperty(name, value)
+        }
     }
     try {
         val code = connection.responseCode
